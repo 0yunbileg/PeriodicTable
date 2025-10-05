@@ -5,8 +5,6 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 
 const Header = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
     <Navbar
       expand="lg"
@@ -39,10 +37,10 @@ const Header = () => {
               Periodic Table
             </Nav.Link>
             <Nav.Link
-              href="/about"
+              href="/quiz"
               className="!text-white hover:!text-[#DFFF9C] transition-colors"
             >
-              About
+              Quiz
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>
