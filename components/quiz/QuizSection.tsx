@@ -1,17 +1,20 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 
 interface QuizSectionPrompt {
   questions: { question: string; options: string[]; answer: string }[];
 }
 
 const QuizSection = ({ questions }: QuizSectionPrompt) => {
-  const [retryKey, setRetryKey] = useState(0); // 🔑 this triggers reshuffle on retry
+  const [retryKey, setRetryKey] = useState(0);
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState("");
   const [finished, setFinished] = useState(false);
+
+  const correctSound = useRef<HTMLAudioElement | null>(null);
+  const wrongSound = useRef<HTMLAudioElement | null>(null);
 
   const randomQuestions = useMemo(() => {
     const shuffled = [...questions].sort(() => Math.random() - 0.5);
@@ -22,7 +25,13 @@ const QuizSection = ({ questions }: QuizSectionPrompt) => {
 
   function handleAnswer(option: string) {
     setSelected(option);
-    if (option === question.answer) setScore((s) => s + 1);
+
+    if (option === question.answer) {
+      setScore((s) => s + 1);
+      correctSound.current?.play();
+    } else {
+      wrongSound.current?.play();
+    }
 
     setTimeout(() => {
       if (current + 1 < randomQuestions.length) {
@@ -50,7 +59,7 @@ const QuizSection = ({ questions }: QuizSectionPrompt) => {
           You scored {score} / {randomQuestions.length}
         </p>
         <button
-          className="mt-4 px-4 py-2 bg-[#b4e55c] rounded-lg hover:bg-blue-700 transition"
+          className="mt-4 px-4 py-2 bg-[#b4e55c] !rounded-lg hover:bg-[#8fe64a] transition"
           onClick={handleRetry}
         >
           Retry
@@ -60,7 +69,9 @@ const QuizSection = ({ questions }: QuizSectionPrompt) => {
   }
 
   return (
-    <div className="w-md mx-auto p-6 rounded-2xl shadow-lg bg-white/10 backdrop-blur">
+    <div className="w-sm md:w-md mx-auto p-6 rounded-2xl shadow-lg bg-white/20 backdrop-blur">
+      <audio ref={correctSound} src="/audios/correct.mp3" preload="auto" />
+      <audio ref={wrongSound} src="/audios/wrong.mp3" preload="auto" />
       <h2 className="text-xl font-semibold mb-4">{question.question}</h2>
 
       <div className="flex flex-col gap-3">
@@ -72,11 +83,11 @@ const QuizSection = ({ questions }: QuizSectionPrompt) => {
             ${
               selected
                 ? option === question.answer
-                  ? "bg-[#8fe64a] text-black" // correct answer: bright green bg, black text
+                  ? "bg-[#8fe64a] text-black"
                   : option === selected
-                  ? "bg-[#f77f7f] text-white" // wrong selection: soft red bg, white text
-                  : "bg-gray-200 text-black" // other options after selection: light gray bg
-                : "bg-[#b4e55c] hover:bg-gray-200  text-black" // unselected: light green, darker green on hover
+                  ? "bg-[#f77f7f] text-white"
+                  : "bg-gray-200 text-black"
+                : "bg-[#b4e55c] hover:bg-gray-200  text-black"
             }`}
             disabled={!!selected}
           >
@@ -85,7 +96,7 @@ const QuizSection = ({ questions }: QuizSectionPrompt) => {
         ))}
       </div>
 
-      <p className="mt-4 text-sm text-gray-600">
+      <p className="mt-4 text-sm text-gray-300">
         Question {current + 1} / {randomQuestions.length}
       </p>
     </div>

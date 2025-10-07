@@ -9,7 +9,7 @@ export default function Quiz() {
   const [key, setKey] = useState("easy");
 
   return (
-    <div className="container flex justify-center">
+    <div className="container p-4 max-w-[50vw] flex justify-center">
       <div className="max-w-md mt-[65px]">
         <style>
           {`
@@ -27,7 +27,7 @@ export default function Quiz() {
         </style>
 
         <Tabs
-          id="fill-tab-example"
+          id=""
           fill
           activeKey={key}
           onSelect={(k) => k && setKey(k)}
